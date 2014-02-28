@@ -1,0 +1,26 @@
+<html>
+    <body>
+    <div>
+    <style scoped>
+      table { border-collapse: collapse; border: solid thick; }
+      colgroup, tbody { border: solid medium; }
+      td { border: solid thin; height: 1.4em; width: 1.4em; text-align: center; padding: 0; }
+      thead { font-weight: bold ;}
+    </style>
+    <table>
+       <thead>
+       <tr>
+          <td> Team Name
+          <td> Score
+
+       <tbody>
+       {% for team in teams %}
+       <tr> 
+          <td> {{ team.user.name }}
+          <td> {{ team.score }}
+       {% endfor %}
+    </table>
+    </div>
+    </body>
+</html>
+

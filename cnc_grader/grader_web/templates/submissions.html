@@ -1,0 +1,34 @@
+<html>
+    <body>
+    <div>
+    <style scoped>
+      table { border-collapse: collapse; border: solid thick; }
+      colgroup, tbody { border: solid medium; }
+      td { border: solid thin; height: 1.4em; width: 1.4em; text-align: center; padding: 0; }
+      thead { font-weight: bold ;}
+    </style>
+    <table>
+       <thead>
+       <tr>
+          <td> ID
+          <td> Time
+          <td> Problem Title
+          <td> Graded
+          <td> Passed
+          <td> Notes
+
+       <tbody>
+       {% for submission in submissions %}
+       <tr> 
+          <td> {{ submission.id }}
+          <td> {{ submission.submission_time }}
+          <td> {{ submission.problem.title }} 
+          <td> {{ submission.graded }}
+          <td> {{ submission.passed }}
+          <td> {{ submission.note }}
+       {% endfor %}
+    </table>
+    </div>
+    </body>
+</html>
+
