@@ -1,2 +1,6 @@
+celery[redis]
 django
+django-celery
 django-registration
+docker-py
+redis

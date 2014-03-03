@@ -36,7 +36,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cnc_grader.docker_worker',
     'cnc_grader.grader_web',
+    'djcelery',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -81,3 +83,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+BROKER_URL = 'redis://172.17.0.2:6379/0'
