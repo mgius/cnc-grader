@@ -1,8 +1,8 @@
 FROM stackbrew/ubuntu
 MAINTAINER crashandcompile@markgius.com
 
-RUN apt-get install python
+RUN apt-get update
+RUN apt-get install -y python ruby default-jdk gcc g++ perl
 
-ADD ./run_test.sh /run_test.sh
-RUN chmod +x ./run_test.sh
-CMD ./run_test.sh
+ADD ./test_executor.py /test_executor.py
+RUN chmod +x ./test_executor.py

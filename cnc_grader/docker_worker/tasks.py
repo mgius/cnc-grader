@@ -1,15 +1,28 @@
+#! /usr/bin/env python
+
+import logging
 import os
 import shutil
 import tempfile
 
 from celery import shared_task
 import docker
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from cnc_grader.grader_web import models
 
 
+@receiver(post_save, sender=models.Submission)
+def submit_execute(signal, sender, instance, created, **kwargs):
+    if created:
+        print "barf"
+        logging.info("Submitting test run for instance id %d", instance.id)
+        execute_submission.delay(instance.id)
+
+
 @shared_task()
-def debug_task(submission_id):
+def execute_submission(submission_id):
     submission = models.Submission.objects.get(id=submission_id)
     inputs_dir = tempfile.mkdtemp()
     outputs_dir = tempfile.mkdtemp()
@@ -18,8 +31,8 @@ def debug_task(submission_id):
     result = 1
     try:
         for testcase in submission.problem.testcase_set.all():
-            infile = os.path.join(inputs_dir, 'in%d' % testcase.id)
-            outfile = os.path.join(outputs_dir, 'out%d' % testcase.id)
+            infile = os.path.join(inputs_dir, '%d' % testcase.id)
+            outfile = os.path.join(outputs_dir, '%d' % testcase.id)
             with open(infile, 'w') as f:
                 f.write(testcase.input)
 
@@ -33,6 +46,12 @@ def debug_task(submission_id):
 
         container_id = c.create_container(
             'crashandcompile',
+            command=('/test_executor.py'
+                     ' --inputsdir /inputs'
+                     ' --outputsdir /outputs'
+                     ' --submission ' +
+                     os.path.join('/submission',
+                                  os.path.basename(submission.file.name))),
             volumes=['/inputs/', '/outputs', '/submission'])
         c.start(container_id,
                 binds={inputs_dir: '/inputs',

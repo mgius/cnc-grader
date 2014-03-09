@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import argparse
 import functools
 import logging
@@ -153,6 +155,13 @@ class CPP(BaseLanguage):
 
     def run(self, inputfile, outputfile):
         self._run_diffed([self.compiled_filename], inputfile, outputfile)
+
+
+@extension("rb")
+class Ruby(BaseLanguage):
+    def run(self, inputfile, outputfile):
+        self._run_diffed(['ruby', self.compiled_filename], inputfile,
+                         outputfile)
 
 
 def parse_args():
