@@ -39,7 +39,7 @@ def upload_to(instance, filename):
 
 
 class Submission(models.Model):
-    team = models.ForeignKey(User)  # to Team?
+    team = models.ForeignKey(User)
     problem = models.ForeignKey(Problem)
     file = models.FileField(upload_to=upload_to)
     submission_time = models.DateTimeField(auto_now_add=True)
