@@ -1,0 +1,29 @@
+<html>
+<head>
+<title>
+{% block title %}
+Crash and Compile
+{% endblock title %}
+</title>
+
+<body>
+
+{% if user.is_authenticated %}
+<div>
+<style scoped>
+div { padding-bottom: 2em }
+a { font-weight: bold ; padding-right: 25px }
+</style>
+<a href="{% url 'teamscoreview' %}">Team Score Overview</a>
+<a href="{% url 'usersubmissionview' %}">My Team's Submissions</a>
+<a href="{% url 'django.contrib.auth.views.logout' %}">Logout</a>
+</div>
+{% endif %}
+
+{% block content %}
+{% endblock content %}
+
+</body>
+</html>
+
+

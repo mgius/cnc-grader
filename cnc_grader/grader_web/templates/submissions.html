@@ -1,13 +1,6 @@
-<html>
-    <body>
-    <div>
-    <style scoped>
-      table { border-collapse: collapse; border: solid thick; }
-      colgroup, tbody { border: solid medium; }
-      td { border: solid thin; height: 1.4em; width: 1.4em; text-align: center; padding: 0; }
-      thead { font-weight: bold ;}
-    </style>
-    <table>
+{% extends 'base-table.html' %}
+
+{% block tablecontents %}
        <thead>
        <tr>
           <td> ID
@@ -27,8 +20,5 @@
           <td> {{ submission.passed }}
           <td> {{ submission.note }}
        {% endfor %}
-    </table>
-    </div>
-    </body>
-</html>
+{% endblock tablecontents %}
 

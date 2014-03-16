@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div>
+    <style scoped>
+      table { border-collapse: collapse; border: solid thick; 
+              margin-left: auto; margin-right: auto}
+      colgroup, tbody { border: solid medium; }
+      td { border: solid thin; height: 1.4em; width: 14em; text-align: center; padding: 0; }
+      thead { font-weight: bold ;}
+    </style>
+    <table>
+{% block tablecontents %}
+{% endblock tablecontents %}
+    </table>
+    </div>
+{% endblock content %}

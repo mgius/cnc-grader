@@ -1,5 +1,6 @@
-<html>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
 {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
@@ -17,8 +18,9 @@
 </tr>
 </table>
 
+<p> To register an account, <a href="{% url 'registration_register' %}">Click here</a> </p>
+
 <input type="submit" value="login" />
-<input type="hidden" name="next" value="{{ next }}" />
+<input type="hidden" name="next" value="{{ next | default:"/" }}" />
 </form>
-</body>
-</html>
+{% endblock content %}

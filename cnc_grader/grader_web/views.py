@@ -1,7 +1,7 @@
-from django.shortcuts import render
 from django.views import generic
 
 from cnc_grader.grader_web.models import Submission, Team
+
 
 # Create your views here.
 class UserSubmissionsView(generic.ListView):
@@ -12,6 +12,7 @@ class UserSubmissionsView(generic.ListView):
         """Return the last five published polls."""
         return Submission.objects.filter(team=self.request.user.id
             ).order_by('-submission_time')[:5]
+
 
 class TeamScoreView(generic.ListView):
     template_name = 'teamscore.html'
