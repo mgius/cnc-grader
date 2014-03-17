@@ -37,11 +37,13 @@ class SubmissionForm(ModelForm):
         super(SubmissionForm, self).__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
+        logging.warn("in_save")
         kwargs['commit'] = False
         obj = super(SubmissionForm, self).save(*args, **kwargs)
         if self.request:
-            obj.team = self.request.user.id
+            obj.team = self.request.user
         obj.save()
+        return obj
 
 
 class SubmitProblemView(generic.CreateView):
