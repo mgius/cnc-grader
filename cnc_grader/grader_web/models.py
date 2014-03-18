@@ -1,9 +1,15 @@
 # pylint: disable=W0232
+import logging
 import os
 import time
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+logger = logging.getLogger(__name__)
 
 
 class Team(models.Model):
@@ -12,6 +18,14 @@ class Team(models.Model):
 
     def __unicode__(self):
         return unicode(self.user.__unicode__())
+
+
+@receiver(post_save, sender=User)
+def create_team(signal, sender, instance, created,  # pylint: disable=W0613
+                **kwargs):
+    if created:
+        Team(user=instance).save()
+        logger.debug("Created Team for user %s", instance.username)
 
 
 class Problem(models.Model):
@@ -39,7 +53,7 @@ def upload_to(instance, filename):
 
 
 class Submission(models.Model):
-    team = models.ForeignKey(User)
+    team = models.ForeignKey(Team)
     problem = models.ForeignKey(Problem)
     file = models.FileField(upload_to=upload_to)
     submission_time = models.DateTimeField(auto_now_add=True)

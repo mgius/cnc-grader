@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from collections import defaultdict
 import logging
 import os
 import shutil
@@ -13,10 +14,12 @@ from django.dispatch import receiver
 from cnc_grader.grader_web import models
 
 
+logger = logging.getLogger()
+
+
 @receiver(post_save, sender=models.Submission)
 def submit_execute(signal, sender, instance, created, **kwargs):
     if created:
-        print "barf"
         logging.info("Submitting test run for instance id %d", instance.id)
         execute_submission.delay(instance.id)
 
@@ -29,6 +32,8 @@ def execute_submission(submission_id):
     submission_dir = tempfile.mkdtemp()
     c = docker.Client()
     result = 1
+    logger.info("Grading submission %d for team %s",
+                submission_id, submission.team.user.username)
     try:
         for testcase in submission.problem.testcase_set.all():
             infile = os.path.join(inputs_dir, '%d' % testcase.id)
@@ -53,6 +58,8 @@ def execute_submission(submission_id):
                      os.path.join('/submission',
                                   os.path.basename(submission.file.name))),
             volumes=['/inputs/', '/outputs', '/submission'])
+        logger.debug("Created container %s to execute submission %d",
+                     container_id, submission_id)
         c.start(container_id,
                 binds={inputs_dir: '/inputs',
                        outputs_dir: '/outputs',
@@ -67,3 +74,38 @@ def execute_submission(submission_id):
         submission.graded = True
         submission.passed = (result == 0)
         submission.save()
+
+        if submission.passed:
+            # this is rather naive and easily abused...
+            calculate_team_scores.delay()
+
+
+@shared_task()
+def calculate_team_scores():
+    max_winners = 3
+    submissions = models.Submission.objects.order_by('submission_time').all()
+    teams = models.Team.objects.all()
+
+    correct_for_problem = defaultdict(int)
+    score_for_team = defaultdict(int)
+    # problem -> team -> bool
+    points_awarded_for_problem = defaultdict(lambda: defaultdict(bool))
+
+    for submission in submissions:
+        if not submission.passed:
+            continue
+
+        if points_awarded_for_problem[submission.problem][submission.team]:
+            continue
+
+        if correct_for_problem[submission.problem] >= max_winners:
+            continue
+
+        score_for_team[submission.team] += (
+            max_winners - correct_for_problem[submission.problem])
+        correct_for_problem[submission.problem] += 1
+        points_awarded_for_problem[submission.problem][submission.team] = True
+
+    for team in teams:
+        team.score = score_for_team[team]
+        team.save()
