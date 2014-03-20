@@ -85,3 +85,8 @@ STATIC_URL = '/static/'
 
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 BROKER_URL = 'redis://172.17.0.2:6379/0'
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
