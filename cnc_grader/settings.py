@@ -35,7 +35,6 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'cnc_grader.docker_worker',
     'cnc_grader.grader_web',
     'djcelery',
