@@ -21,7 +21,7 @@ class TeamScoreView(generic.ListView):
 
     def get_queryset(self):
         """Return teams ordered by score."""
-        return Team.objects.order_by('score')
+        return Team.objects.order_by('-score')
 
 
 class SubmissionForm(ModelForm):

@@ -23,7 +23,9 @@ echo "Updating apt repository..."
 sudo apt-get update -qq
 
 echo "Installing base packages..."
-sudo apt-get install -y -qq git python python-dev python-pip libssl-dev lxc-docker apache2 libapache2-mod-wsgi apache2-mpm-prefork apache2-utils libexpat1 ssl-cert lxc-docker
+sudo apt-get install -y -qq git python python-dev python-pip libssl-dev \
+   lxc-docker apache2 libapache2-mod-wsgi apache2-mpm-prefork apache2-utils \
+   libexpat1 ssl-cert lxc-docker cgroup-lite
 
 echo "Creating SSH key..."
 ssh-keygen -t rsa -N "" -f /home/ubuntu/.ssh/id_rsa -y
@@ -47,15 +49,19 @@ sudo service docker restart
 
 cd ~/cnc-grader
 
+./build_docker.sh
+
 echo "Installing application schema..."
 python ./manage.py syncdb --noinput
+chown ubuntu:www-data db.sqlite3
+chmod g+rw db.sqlite3
 
 echo "Configuring Webserver..."
 sudo mkdir -p /var/python/eggs
 sudo mkdir -p /var/log/apache
 
 sudo a2enmod ssl
-sudo mkdir /etc/apache2/ssl
+sudo mkdir -p /etc/apache2/ssl
 
 sudo rm /etc/apache2/sites-enabled/000-default
 sudo ln -s /home/ubuntu/cnc-grader/apache.conf /etc/apache2/sites-enabled/000-default
@@ -65,7 +71,12 @@ sudo openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US/ST=CA
 sudo chown -R ubuntu:www-data /home/ubuntu/cnc-grader
 sudo chown -R ubuntu:www-data /var/python/eggs
 sudo chown -R ubuntu:www-data /var/log/apache
+sudo mkdir /var/www/submissions
+sudo chown -R ubuntu:www-data /var/www/submissions
+sudo chmod ug+rwx /var/www/submissions
 
 sudo service apache2 restart
+
+docker ps -a | grep -q "redis" || docker run -d dockerfiles/redis 
 
 exit 0
