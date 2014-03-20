@@ -1,0 +1,13 @@
+project_config:
+  name: cnc-grader
+  image: Ubuntu 13.04
+  remote_user: ubuntu
+  flavor_name: n1.medium
+  sec_groups: [
+    'icmp, -1, -1, 0.0.0.0/0',
+    'tcp, 22, 22, 0.0.0.0/0',
+    'tcp, 80, 80, 0.0.0.0/0',
+    'tcp, 443, 80, 0.0.0.0/0',
+  ]
+  provision_scripts:
+    - ./provision.sh

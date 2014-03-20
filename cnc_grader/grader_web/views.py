@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.forms import ModelForm
 from django.views import generic
 
-from cnc_grader.grader_web.models import Submission, Team
+from cnc_grader.grader_web.models import Problem, Submission, Team
 
 
 class UserSubmissionsView(generic.ListView):
@@ -54,3 +54,11 @@ class SubmitProblemView(generic.CreateView):
         kwargs = super(SubmitProblemView, self).get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
+
+
+class CurrentProblemView(generic.DetailView):
+    template_name = 'problem_detail.html'
+    context_object_name = 'problem'
+
+    def get_object(self, queryset=None):
+        return Problem.objects.order_by('-id')[0]
