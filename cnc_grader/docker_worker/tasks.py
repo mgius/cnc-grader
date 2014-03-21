@@ -57,7 +57,8 @@ def execute_submission(submission_id):
                      ' --submission ' +
                      os.path.join('/submission',
                                   os.path.basename(submission.file.name))),
-            volumes=['/inputs/', '/outputs', '/submission'])
+            volumes=['/inputs/', '/outputs', '/submission'],
+            network_disabled=True)
         logger.debug("Created container %s to execute submission %d",
                      container_id, submission_id)
         c.start(container_id,
