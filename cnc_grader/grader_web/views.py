@@ -27,7 +27,7 @@ class TeamScoreView(generic.ListView):
 class SubmissionForm(ModelForm):
     class Meta:
         model = Submission
-        fields = ['file']
+        fields = ['problem', 'file']
 
     def __init__(self, *args, **kwargs):  # pylint: disable=E1002
         self.request = kwargs.pop('request', None)
@@ -38,7 +38,7 @@ class SubmissionForm(ModelForm):
         obj = super(SubmissionForm, self).save(*args, **kwargs)
         if self.request:
             obj.team = self.request.user.team
-            obj.problem = Problem.objects.order_by('-id')[0]
+            # obj.problem = Problem.objects.order_by('-id')[0]
         obj.save()
         return obj
 
