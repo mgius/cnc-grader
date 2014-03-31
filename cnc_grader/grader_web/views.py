@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.forms import ModelForm
 from django.views import generic
 
-from cnc_grader.grader_web.models import Problem, Submission, Team
+from cnc_grader.models import Problem, Submission, Team
 
 
 class UserSubmissionsView(generic.ListView):

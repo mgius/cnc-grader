@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from cnc_grader.grader_web.models import Problem, TestCase, Team, Submission
+from cnc_grader.models import Problem, TestCase, Team, Submission
 
 
 # Register your models here.

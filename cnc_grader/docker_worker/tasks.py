@@ -11,7 +11,7 @@ import docker
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from cnc_grader.grader_web import models
+from cnc_grader import models
 
 
 logger = logging.getLogger()
@@ -61,19 +61,23 @@ def execute_submission(submission_id):
             network_disabled=True)
         logger.debug("Created container %s to execute submission %d",
                      container_id, submission_id)
+        stdout = c.attach(container_id, stream=True)
         c.start(container_id,
                 binds={inputs_dir: '/inputs',
                        outputs_dir: '/outputs',
                        submission_dir: '/submission'})
         # TODO: needs timeout
         result = c.wait(container_id)
+        passed = (result == 0)
+        if not passed:
+            logger.info('\n'.join(list(stdout)))
 
     finally:
         shutil.rmtree(inputs_dir)
         shutil.rmtree(outputs_dir)
         shutil.rmtree(submission_dir)
         submission.graded = True
-        submission.passed = (result == 0)
+        submission.passed = passed
         submission.save()
 
         if submission.passed:
@@ -102,8 +106,10 @@ def calculate_team_scores():
         if correct_for_problem[submission.problem] >= max_winners:
             continue
 
-        score_for_team[submission.team] += (
-            max_winners - correct_for_problem[submission.problem])
+        award_points = max_winners - correct_for_problem[submission.problem]
+        logger.info("Awarding team %s %d points for problem %s",
+                    submission.team, award_points, submission.problem)
+        score_for_team[submission.team] += award_points
         correct_for_problem[submission.problem] += 1
         points_awarded_for_problem[submission.problem][submission.team] = True
 
