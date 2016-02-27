@@ -1,11 +1,12 @@
 from django.core.urlresolvers import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import ModelForm
 from django.views import generic
 
 from cnc_grader.models import Problem, Submission, Team
 
 
-class UserSubmissionsView(generic.ListView):
+class UserSubmissionsView(LoginRequiredMixin, generic.ListView):
     template_name = 'submissions.html'
     context_object_name = 'submissions'
 
@@ -15,7 +16,7 @@ class UserSubmissionsView(generic.ListView):
             ).order_by('-submission_time')[:5]
 
 
-class TeamScoreView(generic.ListView):
+class TeamScoreView(LoginRequiredMixin, generic.ListView):
     template_name = 'teamscore.html'
     context_object_name = 'teams'
 
@@ -43,7 +44,7 @@ class SubmissionForm(ModelForm):
         return obj
 
 
-class SubmitProblemView(generic.CreateView):
+class SubmitProblemView(LoginRequiredMixin, generic.CreateView):
     template_name = 'submit_problem.html'
     form_class = SubmissionForm
     success_url = reverse_lazy("usersubmissionview")
@@ -57,7 +58,7 @@ class SubmitProblemView(generic.CreateView):
         return kwargs
 
 
-class CurrentProblemView(generic.DetailView):
+class CurrentProblemView(LoginRequiredMixin, generic.DetailView):
     template_name = 'problem_detail.html'
     context_object_name = 'problem'
 
