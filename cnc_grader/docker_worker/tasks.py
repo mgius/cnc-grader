@@ -61,7 +61,7 @@ def execute_submission(submission_id):
             network_disabled=True)
         logger.debug("Created container %s to execute submission %d",
                      container_id, submission_id)
-        stdout = c.attach(container_id, stream=True)
+        stdout = c.logs(container_id, stdout=True, stderr=True, stream=True)
         c.start(container_id,
                 binds={inputs_dir: '/inputs',
                        outputs_dir: '/outputs',
@@ -69,8 +69,17 @@ def execute_submission(submission_id):
         # TODO: needs timeout
         result = c.wait(container_id)
         passed = (result == 0)
+        notes = ''
         if not passed:
             logger.info('\n'.join(list(stdout)))
+
+            if result == 1:
+                notes = "Compiled failed"
+            elif result == 2:
+                notes = "Test case failed"
+            elif result == 3:
+                notes = "Bad extension"
+
 
     finally:
         shutil.rmtree(inputs_dir)
@@ -78,6 +87,7 @@ def execute_submission(submission_id):
         shutil.rmtree(submission_dir)
         submission.graded = True
         submission.passed = passed
+        submission.note = notes
         submission.save()
 
         if submission.passed:

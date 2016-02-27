@@ -9,6 +9,10 @@ import sys
 
 MAX_RUN_TIME = 60
 
+COMPILE_FAILED = 1
+TEST_CASE_FAILED = 2
+BAD_EXTENSION = 3
+
 
 class Registry(object):
     def __init__(self):
@@ -68,7 +72,7 @@ class BaseLanguage(object):
                           "  Diff exit code %d\n"
                           "  Input file %s",
                           run_base, run_exit, diff_exit, inputfile)
-            sys.exit(1)
+            sys.exit(TEST_CASE_FAILED)
 
     def run(self, inputfile, outputfile):
         raise NotImplementedError
@@ -104,7 +108,7 @@ class Java(BaseLanguage):
                           self.source_filename,
                           compile_command.stdout.read(),
                           compile_command.stderr.read())
-            sys.exit(1)
+            sys.exit(COMPILE_FAILED)
 
     def run(self, inputfile, outputfile):
         classpath = os.path.dirname(self.source_filename)
@@ -129,7 +133,7 @@ class C(BaseLanguage):
                           self.source_filename,
                           compile_command.stdout.read(),
                           compile_command.stderr.read())
-            sys.exit(1)
+            sys.exit(COMPILE_FAILED)
 
     def run(self, inputfile, outputfile):
         self._run_diffed([self.compiled_filename], inputfile, outputfile)
@@ -151,7 +155,7 @@ class CPP(BaseLanguage):
                           self.source_filename,
                           compile_command.stdout.read(),
                           compile_command.stderr.read())
-            sys.exit(1)
+            sys.exit(COMPILE_FAILED)
 
     def run(self, inputfile, outputfile):
         self._run_diffed([self.compiled_filename], inputfile, outputfile)
@@ -194,7 +198,7 @@ def main():
 
     if language is None:
         logging.error("Extension %s is not supported", file_ext)
-        sys.exit(1)
+        sys.exit(BAD_EXTENSION)
 
     language = language(args.submission)
     language.compile()
